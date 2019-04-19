@@ -619,23 +619,17 @@ AGO.ResourcesSettings = {
     }
 };
 AGO.Trader = {
-    Content: function () {
+    Content: function (a, b, postData) {
+        postData = "&" + postData;
+        "importexport" === STR.getParameter("show", postData) && AGO.Trader.onImportExport();
         DOM.disableActiveElement();
         DOM.disableAutocomplete()
     },
     Ready: function () {
-        DOM.addObserver(DOM.query("#inhalt"), {childList: true}, function (mutations) {
-            for (let i = 0; i < mutations.length; i++) {
-                let mutation = mutations[i];
-                if (mutation.target.id && mutation.target.id === "inhalt" && mutation.addedNodes && mutation.addedNodes.length) {
-                    OBJ.iterate(mutation.addedNodes, function (node) {
-                        if (mutation.addedNodes[node].id === "div_traderImportExport") AGO.Trader.onImportExport();
-                    });
-                }
-            }
-        });
+
     },
     onImportExport: function () {
+        console.log("importexport");
         DOM.addObserver(DOM.query("#div_traderImportExport .bargain_text"), {
             childList: true,
             characterData: true

@@ -20,12 +20,17 @@ AGO.Main = {
             }
         );
         document.getElementById("officers").classList.contains("all") ? AGO.Option.set("comstaff", 1) : AGO.Option.set("comstaff", 0);
-		
+
+        console.log(AGO.Option.get("nextItem", 0));
 		if (!AGO.Option.get("nextItem", 0)) {
             AGO.Trader && AGO.Trader.updateNextItem(0, function (highlight) {
                 1 === highlight && (DOM.addClass(".premiumHighligt", null, "selected"));
             });
-        } else if (AGO.Time.ogameTime > AGO.Option.get("nextItem", 0)) {
+        } else if (AGO.Time.ogameTime > AGO.Option.get("nextItem")) {
+            AGO.Trader && AGO.Trader.updateNextItem(0, function (highlight) {
+                1 === highlight && (DOM.addClass(".premiumHighligt", null, "selected"));
+            });
+        } else if (AGO.Option.get("nextItem") === -1) {
             DOM.addClass(".premiumHighligt", null, "selected");
         }
     },
