@@ -912,12 +912,24 @@ AGO.Building = {
         }
     }, showConstructions: function () {
         function a(a, c) {
-            var d, e, g;
+            function getTime(id) {
+                let boxElement, scriptElement, scriptText, matchResults, finishTime
+                boxElement = document.getElementById("productionbox"+id+"component")
+                scriptElement = boxElement.querySelector("script")
+                scriptText = scriptElement.text//t.match(/restTime\S+\s=\s(\d+)/)
+                matchResults = scriptText.match(/restTime\S+\s=\s(\d+)/)
+                if (matchResults.length > 1) {
+                    finishTime = NMR.parseIntAbs(matchResults[1])
+                    return AGO.Time.formatTimestamp(finishTime)
+                }
+    
+            }
+            let d, e, g, finishTime;
             (d = document.getElementById(a)
             ) && (e = d.parentNode.parentNode.parentNode.children
             ) && 3 < e.length && ((g = e[1].querySelector("td.desc")
                 ) && 3 === +g.firstChild.nodeType && (g.firstChild.textContent = STR.check(g.firstChild.textContent).replace(/niveau/g, "")
-                ), "shipyard" === c ? (g = document.getElementById("shipSumCount7"), DOM.addClass(g, null, "ago_color_limegreen"), DOM.appendChild(e[0].querySelector("th"),
+                ), "shipyard" === c ? (g = document.getElementById("shipyardCountdown2"), DOM.addClass(g, null, "ago_color_limegreen"), DOM.appendChild(e[0].querySelector("th"),
                         g
                     ), DOM.set("td.building", e[1], {
                             valign: "",
@@ -926,7 +938,7 @@ AGO.Building = {
                     ), d = DOM.appendTR(null, "data"), g = DOM.appendTD(d, "desc"), DOM.appendSPAN(g, {
                             id: "ago_construction_" + c,
                             "class": "ago_construction_finishtime"
-                        }, "\u2009"
+                        }, (finishTime = getTime(c)) ? finishTime : "\u2009"
                     ), DOM.after(e[2], d), (g = e[2].querySelector("br")
                     ) && g.parentNode.removeChild(g)
                 ) : (g = "building" === c && 0 > AGO.Planets.Get("active", "construction") ? " ago_color_palered" : "", DOM.addClass(d, null, "ago_construction_time" + g), g && DOM.addClass(".level", e[1], g), g = d.parentNode, g.className = "desc", DOM.appendChild(e[2].querySelector("td"),
@@ -934,12 +946,12 @@ AGO.Building = {
                     ), DOM.appendSPAN(g, {
                         id: "ago_construction_" + c,
                         "class": "ago_construction_finishtime"
-                    }, "\u2009")
+                    }, (finishTime = getTime(c)) ? finishTime : "\u2009")
                 )
             )
         }
 
-        AGO.Option.is("B02") && (a("Countdown", "building"), a("researchCountdown", "research"), a("shipAllCountdown7", "shipyard")
+        AGO.Option.is("B02") && (a("buildingCountdown", "building"), a("researchCountdown", "research"), a("shipyardCountdown2", "shipyard")
         )
     }, displayConstructions: function () {
         function a(a, b) {
