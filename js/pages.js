@@ -912,17 +912,6 @@ AGO.Building = {
         }
     }, showConstructions: function () {
         function a(countdownElementID, id) {
-            function getTime(id) {
-                let boxElement, scriptElement, scriptText, matchResults
-                boxElement = document.getElementById("productionbox"+id+"component")
-                scriptElement = boxElement.querySelector("script")
-                scriptText = scriptElement.text//t.match(/restTime\S+\s=\s(\d+)/)
-                matchResults = scriptText.match(/restTime\S+\s=\s(\d+)/)
-                if (matchResults.length > 1) {
-                    return NMR.parseIntAbs(matchResults[1])
-                }
-    
-            }
             let countdownElement, descElement, shipyardSumElement, finishTime;
             (countdownElement = document.getElementById(countdownElementID)
             ) && (tbodyChildren = countdownElement.parentNode.parentNode.parentNode.children
@@ -935,14 +924,14 @@ AGO.Building = {
                     finishTimeTRElement = DOM.appendTR(null, "data"), finishTimeTDElement = DOM.appendTD(finishTimeTRElement, "desc"), DOM.appendSPAN(finishTimeTDElement, {
                             id: "ago_construction_" + id,
                             "class": "ago_construction_finishtime"
-                        }, (finishTime = getTime(id)) ? AGO.Time.formatTimestamp(AGO.Time.getFinishTime(finishTime)/1000) : "\u2009"
+                        }, "\u2009"
                     ), DOM.after(tbodyChildren[5], finishTimeTRElement)
                 ) : (isBuilding = "building" === id && 0 > AGO.Planets.Get("active", "construction") ? " ago_color_palered" : "", DOM.addClass(countdownElement, null, "ago_construction_time" + isBuilding), isBuilding && DOM.addClass(".level", tbodyChildren[1], isBuilding), countdownParentElement = countdownElement.parentNode, countdownParentElement.className = "desc", DOM.appendChild(tbodyChildren[2].querySelector("td"),
                     countdownElement
                     ), DOM.appendSPAN(countdownParentElement, {
                         id: "ago_construction_" + id,
                         "class": "ago_construction_finishtime"
-                    }, (finishTime = getTime(id)) ? AGO.Time.formatTimestamp(finishTime) : "\u2009")
+                    }, "\u2009")
                 )
             )
         }
@@ -950,24 +939,50 @@ AGO.Building = {
         AGO.Option.is("B02") && (a("buildingCountdown", "building"), a("researchCountdown", "research"), a("shipyardCountdown2", "shipyard")
         )
     }, displayConstructions: function () {
-        function a(a, b) {
-            DOM.setText("ago_construction_" + a, "id", AGO.Time.format(AGO.Time.getFinishTime(b)))
+        function setText(id, value) {
+            DOM.setText("ago_construction_" + id, "id", value)
         }
 
-        var b, c, d, e, g;
-        if (AGO.Option.is("B02") && (b = AGO.Init.Script()
-        )) {
-            if ((c = b.match(/baulisteCountdown\(getElementByIdWithCache\(["']\w+["']\)\,\s*\d*/gi)
-            ) && c.length) {
-                for (g =
-                         0; g < c.length; g++) {
-                    d = c[g].match(/["'](\w+)["']\)\,\s*(\d*)/i), e = d[1], d = NMR.parseIntAbs(d[2]), "Countdown" === e && a("building", d), "researchCountdown" === e && a("research", d), "moveCountdown" === e && a("move", d);
-                }
+        function getTime(id) {
+            let boxElement, scriptElement, scriptText, matchResults
+            boxElement = document.getElementById("productionbox"+id+"component")
+            scriptElement = boxElement.querySelector("script")
+            scriptText = scriptElement.text//t.match(/restTime\S+\s=\s(\d+)/)
+            matchResults = scriptText.match(/restTime\S+\s=\s(\d+)/)
+            if (matchResults.length > 1) {
+                return NMR.parseIntAbs(matchResults[1])
             }
-            (c = b.match(/shipCountdown\((\s*getElementByIdWithCache\(["']\w+["']\)\,)+(\s*\d*\,){3,3}/i)
-            ) && c.length && a("shipyard", NMR.parseIntFormat(c[2]))
         }
-    }, updateConstruction: function (a) {
+
+        let constructions, id, finishTime, i
+        constructions = document.getElementsByClassName('ago_construction_finishtime');
+        for (i = 0; i < constructions.length; i++) {
+                id = constructions.item(i).id.replace("ago_construction_", "");
+                if (finishTime = getTime(id)) {
+                    if (id == "shipyard") {
+                        setText(id, AGO.Time.formatTimestamp(AGO.Time.getFinishTime(finishTime) / 1000))
+                    } else {
+                        setText(id, AGO.Time.formatTimestamp(finishTime))
+                    }
+                }
+        }
+
+        // old code, won't work anymore since the countdown scripts are not in the global script
+        // var b, c, d, e, g;
+        // if (AGO.Option.is("B02") && (b = AGO.Init.Script()
+        // )) {
+        //     if ((c = b.match(/baulisteCountdown\(getElementByIdWithCache\(["']\w+["']\)\,\s*\d*/gi)
+        //     ) && c.length) {
+        //         for (g =
+        //             0; g < c.length; g++) {
+        //             d = c[g].match(/["'](\w+)["']\)\,\s*(\d*)/i), e = d[1], d = NMR.parseIntAbs(d[2]), "Countdown" === e && a("building", d), "researchCountdown" === e && a("research", d), "moveCountdown" === e && a("move", d);
+        //         }
+        //     }
+        //     (c = b.match(/shipCountdown\((\s*getElementByIdWithCache\(["']\w+["']\)\,)+(\s*\d*\,){3,3}/i)
+        //     ) && c.length && a("shipyard", NMR.parseIntFormat(c[2]))
+        // }
+        console.log("displayConstructions done");
+        }, updateConstruction: function (a) {
         var b, c, d, e, g, h, f;
         if (OBJ.is(a) && AGO.Item.valid(a.id)) {
             if (b = a.id, OBJ.copy({
