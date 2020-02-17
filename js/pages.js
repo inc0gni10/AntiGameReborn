@@ -957,14 +957,17 @@ AGO.Building = {
         let constructions, id, finishTime, i
         constructions = document.getElementsByClassName('ago_construction_finishtime');
         for (i = 0; i < constructions.length; i++) {
-                id = constructions.item(i).id.replace("ago_construction_", "");
-                if (finishTime = getTime(id)) {
-                    if (id == "shipyard") {
-                        setText(id, AGO.Time.formatTimestamp(AGO.Time.getFinishTime(finishTime) / 1000))
-                    } else {
-                        setText(id, AGO.Time.formatTimestamp(finishTime))
-                    }
+            id = constructions.item(i).id.replace("ago_construction_", "");
+            if (finishTime = getTime(id)) {
+                let formattedFinishTime, duration
+                if (id == "shipyard") { // finishTime is represented as the duration to complete queue
+                    duration = finishTime
+                } else { // finishTime is represented as the completion time
+                    duration = finishTime - Math.floor(Date.now()) / 1000 // same logic as ogame to set restTime
                 }
+                formattedFinishTime = AGO.Time.formatTimestamp(AGO.Time.getFinishTime(duration) / 1000)
+                setText(id,AGO.Option.is('A31') ? AGO.Time.convertLocal(formattedFinishTime) : formattedFinishTime)
+            }
         }
 
         // old code, won't work anymore since the countdown scripts are not in the global script
